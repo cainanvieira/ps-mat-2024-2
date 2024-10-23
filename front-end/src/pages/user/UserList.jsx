@@ -14,7 +14,8 @@ import useConfirmDialog from '../../ui/useConfirmDialog'
 import useNotification from '../../ui/useNotification'
 import useWaiting from '../../ui/useWaiting'
 
-export default function CarList() {
+export default function UserList() {
+  
   const columns = [
     {
       field: 'id',
@@ -23,63 +24,26 @@ export default function CarList() {
       width: 80,
     },
     {
-      field: 'brand',
-      headerName: 'Marca/Modelo',
+      field: 'fullname',
+      headerName: 'Nome completo',
       width: 200,
-      // Colocando dois campos na mesma célula
-      valueGetter: (value, row) => row.brand + '/' + row.model,
     },
     {
-      field: 'color',
-      headerName: 'Cor do carro',
+      field: 'username',
+      headerName: 'Nome de usuário',
       width: 150,
     },
 
     {
-      field: 'year_manufacture',
-      headerName: 'Ano de fabricação',
-      width: 150,
+      field: 'email',
+      headerName: 'E-mail',
+      width: 200,
     },
     {
-      field: 'imported',
-      headerName: 'Importado?',
+      field: 'is_admin',
+      headerName: 'É admin?',
       width: 100,
-      renderCell: (value) => (value.row.imported ? 'SIM' : ''),
-    },
-    {
-      field: 'plates',
-      headerName: 'Placa',
-      width: 100,
-    },
-    {
-      field: 'selling_date',
-      headerName: 'Data de venda',
-      width: 120,
-      valueFormatter: (value) =>
-        value ? new Date(value).toLocaleDateString('pt-BR') : '',
-    },
-    {
-      field: 'selling_price',
-      headerName: 'Preço de venda',
-      width: 120,
-      // valueFormatter: (params) =>
-      //   params.selling_price?.toLocaleString('pt-BR', {
-      //     style: 'currency',
-      //     currency: 'BRL',
-      //   }),
-      valueFormatter: (value) =>
-        value
-          ? new Intl.NumberFormat('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-            }).format(value)
-          : '',
-    },
-    {
-      field: 'customer',
-      headerName: 'Cliente',
-      width: 250,
-      renderCell: (value) => value.row?.customer?.name
+      renderCell: (value) => (value.row.is_admin ? 'SIM' : '')
     },
     {
       field: '_edit',
@@ -115,9 +79,9 @@ export default function CarList() {
   ]
 
   const [state, setState] = React.useState({
-    cars: [],
+    users: [],
   })
-  const { cars } = state
+  const { users } = state
 
   const { askForConfirmation, ConfirmDialog } = useConfirmDialog()
   const { notify, Notification } = useNotification()
@@ -134,10 +98,10 @@ export default function CarList() {
   async function fetchData() {
     showWaiting(true)
     try {
-      const result = await myfetch.get('/cars?include=customer')
+      const result = await myfetch.get('/users')
       setState({
         ...state,
-        cars: result,
+        users: result,
       })
     } catch (error) {
       console.error(error)
@@ -152,7 +116,7 @@ export default function CarList() {
       // Exibe a tela de espera
       showWaiting(true)
       try {
-        await myfetch.delete(`/cars/${deleteId}`)
+        await myfetch.delete(`/users/${deleteId}`)
 
         // Recarrega os dados da grid
         fetchData()
@@ -174,7 +138,7 @@ export default function CarList() {
       <ConfirmDialog />
 
       <Typography variant='h1' gutterBottom>
-        Listagem de carros
+        Listagem de usuários
       </Typography>
 
       <Box
@@ -191,7 +155,7 @@ export default function CarList() {
             color='secondary'
             startIcon={<AddBoxIcon />}
           >
-            Novo Carro
+            Novo Usuário
           </Button>
         </Link>
       </Box>
@@ -199,7 +163,7 @@ export default function CarList() {
       <Paper elevation={10}>
         <Box sx={{ height: 400, width: '100%' }}>
           <DataGrid
-            rows={cars}
+            rows={users}
             columns={columns}
             initialState={{
               pagination: {
