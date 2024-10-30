@@ -44,6 +44,15 @@ npm install jsonwebtoken
 # Para ler o token
 npm install dotenv
 
+# Para validar caracteres máximos 
+npm install zod
+
+# Para arrumar pacotes desatualizados
+npm audit fix
+
+# Para validar cpf
+npm install cpf-cnpj-validator
+
 # FRONT-END
 # Para instalar o cors
 npm install cors 
