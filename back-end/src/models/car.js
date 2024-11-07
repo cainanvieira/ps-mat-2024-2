@@ -5,7 +5,7 @@ const minSellingDate = new Date(1960, 0, 1); // Define a data mínima para 1 de 
 const maxYearManufacture = new Date()
 maxYearManufacture.setFullYear(maxYearManufacture.getFullYear())
 
-export default z.object({
+const Car = z.object({
   brand: z
     .string()
     .max(25, { message: 'O marca deve ter, no máximo, 25 caracteres' }),
@@ -18,15 +18,15 @@ export default z.object({
     .string()
     .max(12, { message: 'A cor deve pode ter, no máximo, 12 caracteres' }),
 
-  year_manufacture: z.coerce
+    year_manufacture: z.coerce
     .number()
-    .min(minSellingDate, {
+    .min(minSellingDate.getFullYear(), {
       message: 'O ano de fabricação deve ser maior que 1960',
     })
-    .max(maxYearManufacture, {
-      message: 'O ano de fabricação deve ser menor que ' + maxYearManufacture,
+    .max(new Date().getFullYear(), {
+      message: 'O ano de fabricação deve ser menor que ' + maxYearManufacture.getFullYear(),
     }),
-
+  
   imported: z.boolean(),
 
   plates: z
@@ -47,5 +47,7 @@ export default z.object({
     .number()
     .gte(1000, { message: 'O valor deve ser maior que R$ 1.000' })
     .lte(5000000, { message: 'O valor deve ser menor que R$ 5.000.000' })
-    .nullable(),
-});
+    .nullable()
+  })
+
+  export default Car
