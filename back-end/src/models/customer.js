@@ -17,63 +17,68 @@ minBirthDate.setFullYear(minBirthDate.getFullYear() - 120)
 const Customer = z.object({
   name:
     z.string()
-    .min(5, { message: 'O nome deve ter, no mínimo, 5 caracteres' })
-    .includes(' ', { message: 'O nome deve ter um espaço em branco separando nome e sobrenome' }),
+      .min(5, { message: 'O nome deve ter, no mínimo, 5 caracteres' })
+      .includes(' ', { message: 'O nome deve ter um espaço em branco separando nome e sobrenome' }),
 
   ident_document:
     z.string()
-    // Remove eventuais sublinhados se o usuário não preencheu
-    // totalmente o CPF
-    .transform(val => val.replace('_', ''))
-    .refine(val => val.length === 14, { message: 'O CPF deve ter exatamente 14 dígitos' })
-    .refine(val => cpf.isValid(val), { message: 'CPF inválido' }),
+      // Remove eventuais sublinhados se o usuário não preencheu
+      // totalmente o CPF
+      .transform(val => val.replace('_', ''))
+      .refine(val => val.length === 14, { message: 'O CPF deve ter exatamente 14 dígitos' })
+      .refine(val => cpf.isValid(val), { message: 'CPF inválido' }),
 
-  birth_date:
-    // coerce força a conversão para o tipo Date, se o valor recebido for string
-    z.coerce.date()
-    .min(minBirthDate, { message: 'Data de nascimento está muito no passado' })
-    .max(maxBirthDate, { message: 'O cliente deve ser maior de 18 anos' })
-    .nullable(),     // O campo é opcional
+  birth_date: z
+  .union([ //z.union para conseguir colocar outros tipos dados, sempre especificados
+    z.coerce.date() // coerce força a conversão para o tipo Date, se o valor recebido for string
+      .min(minBirthDate, { message: 'Data de nascimento está muito no passado' })
+      .max(maxBirthDate, { message: 'O cliente deve ser maior de 18 anos' }),
+    z.null(), //nullable não estava funcionando para campos opcionais, substitui para  z.null
+    z.undefined() //para poder não colocar o valor opcional
+  ]),
 
   street_name:
     z.string()
-    .max(40, { message: 'O logradoudo pode ter, no máximo, 40 caracteres' }),
+      .max(40, { message: 'O logradoudo pode ter, no máximo, 40 caracteres' }),
 
   house_number:
     z.string()
-    .max(10, { message: 'O número pode ter, no máximo, 10 caracteres' }),
+      .max(10, { message: 'O número pode ter, no máximo, 10 caracteres' }),
 
-  complements:
+  complements: z
+  .union([ //z.union para conseguir colocar outros tipos dados, sempre especificados
     z.string()
-    .max(20, { message: 'O complemento pode ter, no máximo, 20 caracteres' })
-    .nullable(),
+      .max(20, { message: 'O complemento pode ter, no máximo, 20 caracteres' }),
+    z.null(), //nullable não estava funcionando para campos opcionais, substitui para  z.null
+    z.undefined() //para poder não colocar o valor opcional
+  ]),
 
   district:
     z.string()
-    .max(30, { message: 'O bairro pode ter, no máximo, 30 caracteres' }),
+      .max(30, { message: 'O bairro pode ter, no máximo, 30 caracteres' }),
 
   municipality:
     z.string()
-    .max(40, { message: 'O município pode ter, no máximo, 40 caracteres' }),
+      .max(40, { message: 'O município pode ter, no máximo, 40 caracteres' }),
 
   state:
     z.string()
-    .length(2, { message: 'UF deve ter, exatamente, 2 caracteres' }),
+      .length(2, { message: 'UF deve ter, exatamente, 2 caracteres' }),
 
   phone:
     z.string()
-    .transform(val => val.replace('_', ''))
-    // Depois de um transform(), não podemos usar length(). Por isso, devemos
-    // usar uma função personalizada com refine() para validar o tamanho do
-    // campo
-    .refine(val => {
-      console.log('val.length', val.length, 'val', val)
-      return val.length === 15
-}   , { message: 'O número do telefone/celular deve ter 15 posições' }),
+      .transform(val => val.replace('_', ''))
+      // Depois de um transform(), não podemos usar length(). Por isso, devemos
+      // usar uma função personalizada com refine() para validar o tamanho do
+      // campo
+      .refine(val => {
+        console.log('val.length', val.length, 'val', val)
+        return val.length === 15
+      }, { message: 'O número do telefone/celular deve ter 15 posições' }),
 
   email:
     z.string()
-    .email({ message: 'E-mail inválido' })
+      .email({ message: 'E-mail inválido' })
 
 })
 

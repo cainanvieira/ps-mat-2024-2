@@ -18,7 +18,7 @@ const Car = z.object({
     .string()
     .max(12, { message: 'A cor deve pode ter, no máximo, 12 caracteres' }),
 
-    year_manufacture: z.coerce
+  year_manufacture: z.coerce
     .number()
     .min(minSellingDate.getFullYear(), {
       message: 'O ano de fabricação deve ser maior que 1960',
@@ -26,28 +26,34 @@ const Car = z.object({
     .max(new Date().getFullYear(), {
       message: 'O ano de fabricação deve ser menor que ' + maxYearManufacture.getFullYear(),
     }),
-  
+
   imported: z.boolean(),
 
   plates: z
     .string()
     .max(8, { message: 'A Placa pode ter, no máximo, 8 caracteres' }),
 
-  selling_date:
-    // coerce força a conversão para o tipo Date, se o valor recebido for string
-    z.coerce
-      .date()
-      .min(minSellingDate, { message: 'Data de venda está muito no passado' })
-      .max(maxSellingDate, {
-        message: 'Data de venda não deve ser maior que data atual',
-      })
-      .nullable(),
+  selling_date: z
+    .union([ //z.union para conseguir colocar outros tipos dados, sempre especificados
+      z.coerce
+        .date()
+        .min(minSellingDate, { message: 'Data de venda está muito no passado' })
+        .max(maxSellingDate, {
+          message: 'Data de venda não deve ser maior que data atual',
+        }),
+      z.null(), //nullable não estava funcionando para campos opcionais, substitui para  z.null
+      z.undefined() //para poder não colocar o valor opcional
+    ]),
 
-  selling_price: z.coerce
-    .number()
-    .gte(1000, { message: 'O valor deve ser maior que R$ 1.000' })
-    .lte(5000000, { message: 'O valor deve ser menor que R$ 5.000.000' })
-    .nullable()
-  })
+  selling_price: z
+    .union([ //z.union para conseguir colocar outros tipos dados, sempre especificados
+      z.coerce
+        .number()
+        .gte(1000, { message: 'O valor deve ser maior que R$ 1.000' })
+        .lte(5000000, { message: 'O valor deve ser menor que R$ 5.000.000' }),
+      z.null(), //nullable não estava funcionando para campos opcionais, substitui para  z.null
+      z.undefined() //para poder não colocar o valor opcional
+    ])
+})
 
-  export default Car
+export default Car
